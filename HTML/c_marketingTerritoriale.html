@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="it" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Web Mapping</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <!-- Downloaded Version of Leaflet - https://leafletjs.com/download.html -->
+    <!-- leaflet 1.7.1 css -->
+    <link rel="stylesheet" href="../css/leaflet.css" />
+    <!-- css -->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/fontawesome.min.css" rel="stylesheet"> -->
+
+    <link rel="stylesheet" href="../css/style.css" />
+    <!-- plugin css -->
+    <link rel="stylesheet" href="../css/plugins/leaflet.fullscreen.css" />
+    <link rel="stylesheet" href="../css/plugins/leaflet.awesome-markers.css" />
+
+    <!-- bootstrap 4.3.1 -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+    <!-- ionicon stylesheet -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/4.5.6/css/ionicons.min.css">
+
+    <!-- leaflet 1.7.1 js -->
+    <script src="../js/base/leaflet.js"></script>
+
+    <!-- plugin js -->
+    <script src="../js/plugins/leaflet_side_by_side/leaflet-side-by-side.js"></script>
+
+    <!-- jquery3.1.1 -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- turf@5 -->
+    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@5/turf.min.js"></script>
+
+    <!-- bootstrap 4.3.1 -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <!-- data -->
+    <script src="../data/lajatico_wgs84.js"></script>
+        <script src="../data/a_attivita_produttive_lajatico.js"></script>
+
+      <style>
+          #map {
+              height: 700px;
+              width: 100%;
+              border: solid 2px black;
+          }
+          #descrizione {
+              margin-left: 10px;
+          }
+      </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-sm bg-success navbar-dark">
+      <div class="container">
+        <!-- Brand/logo -->
+        <a class="navbar-brand" target="_blank" href="https://www.comune.lajatico.pi.it/homepage">
+          <img src="../css/images/icons/stemmaLajatico.png" alt="logo" style="width:30px;">
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="collapsibleNavbar">
+          <!-- Links -->
+          <ul class="navbar-nav mx-auto">
+            <li class="nav-item text-center">
+              <a class="nav-link" href="../index.html">HOME</a>
+            </li>
+            <li class="nav-item text-center">
+              <a class="nav-link" href="a_quadroConoscitivo.html">Quadro Conoscitivo</a>
+            </li>
+            <li class="nav-item text-center">
+              <a class="nav-link" href="b_percorsi.html">Percorsi</a>
+            </li>
+            <li class="nav-item active text-center">
+              <a class="nav-link" href="c_marketingTerritoriale.html">Marketing</a>
+            </li>
+            <li class="nav-item text-center">
+              <a class="nav-link" href="d_atlanteSegnalazioni.html">Segnalazioni</a>
+            </li>
+            <!-- Dropdown -->
+            <li class="nav-item dropdown text-center">
+              <a class="nav-link dropdown-toggle" href="d_protezioneCivile.html" id="navbardrop" data-toggle="dropdown">
+                Protezione Civile
+              </a>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="#">PAI</a>
+                <a class="dropdown-item" href="#">Zone Sismiche</a>
+                <a class="dropdown-item" href="#">Frane</a>
+              </div>
+            </li>
+            <!-- Dropdown -->
+            <li class="nav-item dropdown text-center">
+              <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                Transporti
+              </a>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="#">Aeroporti</a>
+                <a class="dropdown-item" href="#">Treni</a>
+                <!--                <a class="dropdown-item" href="#">CAI</a>-->
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+<!-- Begin page content -->
+<main role="main" class="container" >
+    <p class="mt-5 text-justify">
+      Lo Sportello Unico Attività Produttive <b>(SUAP)</b> costituisce lo strumento mediante il quale viene assicurata l'unicità della struttura di riferimento e la semplificazione di tutte le procedure in materia di impianti produttivi di beni e di servizi, al fine della certezza e, ove possibile, della anticipazione dei termini di conclusione dei procedimenti amministrativi.
+      Lo Sportello Unico opera, inoltre, quale centro di impulso per lo sviluppo economico e occupazionale del proprio territorio.
+            <span class="mw-editsection">
+              <span class="mw-editsection-bracket">
+                [
+              </span>
+                <a href="https://www.comune.lajatico.pi.it/uffici-comunali/sportello-unico-attivita27aa0-produttive---suap--28servizio-associato-per-i-comuni-di-lajatico-e-peccioli29/3892"  target="_blank" class="mw-editsection-visualeditor" title="Sportello Unico Attività Produttive">SUAP</a>
+                <span class="mw-editsection-bracket">]
+                </span>
+          </span>
+        </p>
+        <br>
+
+    <!-- Leafet MAP Containner -->
+    <div id="map"></div>
+  </main>
+
+  <!-- Plugins -->
+  <script src="../js/plugins/sidebarV2/leaflet-sidebar.js"></script>
+  <script src="../js/plugins/fullScreen/Leaflet.fullscreen.js"></script>
+  <script src="../js/plugins/awesome-markers/leaflet.awesome-markers.js"></script>
+
+    <script type="text/javascript">
+    var map = L.map('map', {
+      // measureControl: true,
+      fullscreenControl: {
+        pseudoFullscreen: false
+      },
+    }).setView([39.39896,16.29371], 12);
+
+    map.zoomControl.setPosition('bottomleft');
+
+    // var OpenTopoMap = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+    //   maxZoom: 17,
+    //   attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+    // }).addTo(map);
+
+    // var Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    //   attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+    // }).addTo(map);
+    //
+    // L.control.sideBySide(OpenTopoMap, Esri_WorldImagery).addTo(map);
+
+    var masked = turf.mask(lajatico);
+
+    var lajaticoMasked = L.geoJSON(masked, {
+                            opacity: 1,color: 'white',
+                            dashArray: '10, 12, 5',
+                            fillColor: 'grey',
+                            fillOpacity: 0.5,
+                            weight: 1
+                          }
+                        ).addTo(map);
+
+    var layer = L.geoJSON(lajatico);
+    var layer_bounds = layer.getBounds();
+    map.fitBounds(layer_bounds);
+
+    // var redMarker =  L.AwesomeMarkers.icon({
+    //   icon: 'coffee',
+    //   markerColor: 'red',
+    //   prefix: 'fa',
+    //   iconColor: 'black'
+    // });
+
+    // L.marker([51.930083,4.507742], {icon: L.AwesomeMarkers.icon({icon: 'info', prefix: 'fa', markerColor: 'orange'}) }).addTo(map);
+    // var options = { color: 'red', radius: 5, weight: 1
+    // };
+    // var municipio = L.circleMarker([43.475120, 10.728498], options
+    //                               ).addTo(map);
+    //
+    // var popupContent = '<img src="../css/images/foto/centroStorico.jpg" width="300">'
+    //
+    // municipio.bindPopup(popupContent).openPopup();
+    //
+    // municipio.addTo(map);
+    /////////////
+       function onEachFeature3(feature, layer) {
+    //            layer.on({
+    ////                click: zoomToClickedPolygon,
+    //                mouseover: highlightFeatureOnMouseOver, // hover
+    //                mouseout: resetFeatureStyle
+    //            });
+                var props = feature.properties;
+                var tipo = props['TIPO'];
+                var autorizzazione = props['TIPO AUTORIZZAZIONE'];
+                        var titolare = props['TITOLARE: RAGIONE SOCIALE'];
+                        var insegna = props['INSEGNA'];
+                        var postiLetto = props['POSTI LETTO'];
+                        var camere = props['CAMERE/UNITA ABIT.'];
+                        var indirizzo = props['INDIRIZZO'];
+
+                layer.bindPopup(
+                // '<b>Tipo</b>: ' + '<br>' + tipo + '<br>'
+                // + '<b>Autorizzazione</b>: '  + '<br>' +  autorizzazione + '<br>'
+                '<b>Titolare</b>: '  + '<br>' + '<i>' + titolare +'</i>' + '<br>'
+    //            + '<b>Insegna</b>: '  + '<br>' +  insegna + '<br>'
+    //            + '<b>PostiLetto</b>: '  + '<br>' +  postiLetto + '<br>'
+    //            + '<b>Camere</b>: '  + '<br>' +  camere + '<br>'
+                + '<b>Indirizzo</b>: '  + '<br>' + '<i>' + indirizzo +'</i>' + '<br>'
+                );
+            }
+       function onEachFeature2(feature, layer) {
+    //            layer.on({
+    ////                click: zoomToClickedPolygon,
+    //                mouseover: highlightFeatureOnMouseOver, // hover
+    //                mouseout: resetFeatureStyle
+    //            });
+                var props = feature.properties;
+                var tipo = props['TIPO'];
+                var autorizzazione = props['TIPO AUTORIZZAZIONE'];
+                var titolare = props['TITOLARE: RAGIONE SOCIALE'];
+                var insegna = props['INSEGNA'];
+                var postiLetto = props['POSTI LETTO'];
+                var camere = props['CAMERE/UNITA ABIT.'];
+                var indirizzo = props['INDIRIZZO'];
+
+                layer.bindPopup(
+                // '<b>Tipo</b>: ' + '<br>' + tipo + '<br>'
+                // + '<b>Autorizzazione</b>: '  + '<br>' +  autorizzazione + '<br>'
+                '<b>Titolare</b>: '  + '<br>' + '<i>' + titolare +'</i>' + '<br>'
+    //            + '<b>Insegna</b>: '  + '<br>' +  insegna + '<br>'
+                + '<b>PostiLetto</b>: '  + '<br>' + '<i>' + postiLetto +'</i>' + '<br>'
+    //            + '<b>Camere</b>: '  + '<br>' +  camere + '<br>'
+                + '<b>Indirizzo</b>: '  + '<br>' + '<i>' + indirizzo +'</i>' + '<br>'
+                );
+            }
+    ////////////
+        var acconciatoriEstetisti = L.geoJSON(attivitaProduttive, {
+            pointToLayer: function (feature, latlng) {
+                return L.marker(latlng, {icon: L.AwesomeMarkers.icon({icon: 'fa-star ', prefix: 'fa', markerColor: 'blue',  iconColor: 'white', spin:true})
+                                        })
+            },
+          filter: function(feature) {
+            if (feature.properties.TIPO === 'Acconciatori e Estetisti') {
+              return true;
+            }
+          },
+            onEachFeature: onEachFeature3
+        });
+
+        var artigiani = L.geoJSON(attivitaProduttive, {
+            pointToLayer: function (feature, latlng) {
+                return L.marker(latlng, {icon: L.AwesomeMarkers.icon({icon: 'font', prefix: 'fa', markerColor: 'orange',  iconColor: 'white'})
+                                        })
+            },
+          filter: function(feature) {
+            if (feature.properties.TIPO === 'Artigiani') {
+              return true;
+            }
+          },
+            onEachFeature: onEachFeature3
+        });
+
+
+        var agriturismoStruttureRicettive = L.geoJSON(attivitaProduttive, {
+            pointToLayer: function (feature, latlng) {
+                return L.marker(latlng, {icon: L.AwesomeMarkers.icon({icon: 'home', prefix: 'fa', markerColor: 'green',  iconColor: 'black'})
+                                        })
+            },
+            filter: function(feature) {
+                if (feature.properties.TIPO === 'Agriturismo e Strutture ricettive') {
+                    return true;
+            }
+          },
+            onEachFeature: onEachFeature2
+        }).addTo(map);
+
+        var barRistoranti = L.geoJSON(attivitaProduttive, {
+            pointToLayer: function (feature, latlng) {
+                return L.marker(latlng, {icon: L.AwesomeMarkers.icon({icon: 'glass', prefix: 'fa', markerColor: 'purple'})
+                                        })
+            },
+          filter: function(feature) {
+            if (feature.properties.TIPO === 'Bar e Ristoranti') {
+              return true;
+            }
+          },
+            onEachFeature: onEachFeature3
+        });
+
+        var eserciziCommerciali = L.geoJSON(attivitaProduttive, {
+            pointToLayer: function (feature, latlng) {
+                return L.marker(latlng, {icon: L.AwesomeMarkers.icon({icon: 'shopping-cart', prefix: 'fa', markerColor: 'darkblue'})
+                                        })
+            },
+          filter: function(feature) {
+            if (feature.properties.TIPO === 'Esercizi Commerciali') {
+              return true;
+            }
+          },
+            onEachFeature: onEachFeature3
+        });
+
+        var produttoriAgricoli = L.geoJSON(attivitaProduttive, {
+            pointToLayer: function (feature, latlng) {
+                return L.marker(latlng, {icon: L.AwesomeMarkers.icon({icon: 'fa-p', prefix: 'fa', markerColor: '#006d2c',  iconColor: 'white'})
+                                        })
+            },
+          filter: function(feature) {
+            if (feature.properties.TIPO === 'Produttori Agricoli') {
+              return true;
+            }
+          },
+            onEachFeature: onEachFeature3
+        });
+
+        var servizi = L.geoJSON(attivitaProduttive, {
+            pointToLayer: function (feature, latlng) {
+                return L.marker(latlng, {icon: L.AwesomeMarkers.icon({icon: 'font', prefix: 'fa', markerColor: 'orange',  iconColor: 'black'})
+                                        })
+            },
+          filter: function(feature) {
+            if (feature.properties.TIPO === 'Servizi') {
+              return true;
+            }
+          },
+            onEachFeature: onEachFeature3
+        });
+
+
+        var locazioniUsoTuristico = L.geoJSON(attivitaProduttive, {
+            pointToLayer: function (feature, latlng) {
+                return L.marker(latlng, {icon: L.AwesomeMarkers.icon({icon: 'home', prefix: 'fa', markerColor: 'blue',  iconColor: 'black'})
+                                        })
+            },
+          filter: function(feature) {
+            if (feature.properties.TIPO === 'Locazioni ad uso turistico') {
+              return true;
+            }
+          },
+            onEachFeature: onEachFeature2
+        });
+
+        var mbAttr = 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, ' +
+      			'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+      		mbUrl = 'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw';
+
+        var imagery   = L.tileLayer(mbUrl, {id: 'mapbox/satellite-streets-v11', tileSize: 512, zoomOffset: -1, attribution: mbAttr}),
+      		streets  = L.tileLayer(mbUrl, {id: 'mapbox/streets-v11', tileSize: 512, zoomOffset: -1, attribution: mbAttr}).addTo(map);
+
+        var baseLayers = {
+      		"imagery": imagery,
+      		"Streets": streets
+      	};
+        var overlays = {
+          "Agriturismo & Strutture Ricettive": agriturismoStruttureRicettive,
+          "Locazioni ad uso Turistico": locazioniUsoTuristico,
+          "Produttori Agricoli": produttoriAgricoli,
+          "Bar & Ristoranti": barRistoranti,
+          "Esercizi Commerciali": eserciziCommerciali,
+          "Artigiani": artigiani,
+          "Acconciatori & Estetisti": acconciatoriEstetisti,
+          "Servizi": servizi
+        };
+        L.control.layers(baseLayers, overlays, {
+          collapsed: false
+        }).addTo(map);
+    </script>
+    <!--base JS-->
+
+
+    <br /><br /><br />
+    <!-- Footer -->
+    <footer class="py-2 bg-success">
+      <p class="m-0 text-center text-white">Copyright &copy; Filippo Maria Raeli <?php echo date('Y'); ?></p>
+    </footer>
+  </body>
+</html>

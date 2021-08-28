@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="it" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Web Mapping</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <!-- Downloaded Version of Leaflet - https://leafletjs.com/download.html -->
+    <!-- leaflet 1.7.1 css -->
+    <link rel="stylesheet" href="../css/leaflet.css" />
+    <!-- css -->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/fontawesome.min.css" rel="stylesheet"> -->
+
+    <link rel="stylesheet" href="../css/style.css" />
+    <!-- plugin css -->
+    <link rel="stylesheet" href="../css/plugins/leaflet.fullscreen.css" />
+    <link rel="stylesheet" href="../css/plugins/leaflet.awesome-markers.css" />
+
+    <!-- bootstrap 4.3.1 -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+    <!-- ionicon stylesheet -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/4.5.6/css/ionicons.min.css">
+
+<!-- PapaParse 5.1.0-->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.1.0/papaparse.min.js"></script>
+
+    <!-- leaflet 1.7.1 js -->
+    <script src="../js/base/leaflet.js"></script>
+
+    <!-- plugin js -->
+    <script src="../js/plugins/leaflet_side_by_side/leaflet-side-by-side.js"></script>
+
+    <!-- jquery3.1.1 -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- turf@5 -->
+    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@5/turf.min.js"></script>
+
+    <!-- bootstrap 4.3.1 -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <!--Tabletop and GeoJson-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tabletop.js/1.5.2/tabletop.min.js"></script>
+    <!-- data -->
+    <script src="../data/lajatico_wgs84.js"></script>
+
+      <style>
+          #map {
+              height: 500px;
+              width: 100%;
+              border: solid 2px black;
+          }
+          #descrizione {
+              margin-left: 10px;
+          }
+            *{font-family: 'Source Sans Pro', sans-serif;}
+            /* .map {height:70%}
+            #map {position:relative;height:500px;} */
+            .leaflet-popup-content {font-size: medium;}
+            .form-group{width:250px;margin-bottom:0;}
+            .form-control{resize:none;}
+            .text-muted{font-size:smaller;}
+            hr {margin: 10px 0;}
+
+      </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-sm bg-success navbar-dark">
+      <div class="container">
+        <!-- Brand/logo -->
+        <a class="navbar-brand" target="_blank" href="https://www.comune.lajatico.pi.it/homepage">
+          <img src="../css/images/icons/stemmaLajatico.png" alt="logo" style="width:30px;">
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="collapsibleNavbar">
+          <!-- Links -->
+          <ul class="navbar-nav mx-auto">
+            <li class="nav-item text-center">
+              <a class="nav-link" href="../index.html">HOME</a>
+            </li>
+            <li class="nav-item text-center">
+              <a class="nav-link" href="a_quadroConoscitivo.html">Quadro Conoscitivo</a>
+            </li>
+            <li class="nav-item text-center">
+              <a class="nav-link" href="b_percorsi.html">Percorsi</a>
+            </li>
+            <li class="nav-item text-center">
+              <a class="nav-link" href="c_marketingTerritoriale.html">Marketing</a>
+            </li>
+            <li class="nav-item active text-center">
+              <a class="nav-link" href="d_atlanteSegnalazioni.html">Segnalazioni</a>
+            </li>
+            <!-- Dropdown -->
+            <li class="nav-item dropdown text-center">
+              <a class="nav-link dropdown-toggle" href="d_protezioneCivile.html" id="navbardrop" data-toggle="dropdown">
+                Protezione Civile
+              </a>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="#">PAI</a>
+                <a class="dropdown-item" href="#">Zone Sismiche</a>
+                <a class="dropdown-item" href="#">Frane</a>
+              </div>
+            </li>
+            <!-- Dropdown -->
+            <li class="nav-item dropdown text-center">
+              <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                Transporti
+              </a>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="#">Aeroporti</a>
+                <a class="dropdown-item" href="#">Treni</a>
+                <!--                <a class="dropdown-item" href="#">CAI</a>-->
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+<!-- Begin page content -->
+<main role="main" class="container" >
+    <p class="mt-5 text-justify">
+
+        <form autocomplete="off" name="gform" id="gform" enctype="text/plain" action="https://docs.google.com/forms/d/e/1FAIpQLSf1texdsEk-a0nNuoT03Ur7jO1Gy3Aj7Lxc4NWc_qMuTyqVyA/formResponse?" target="hidden_iframe" onsubmit="submitted=true;">
+          <div class="form-row">
+
+            <div class="col-md-4">
+              <br>
+              Nome:
+              <input type="text" step="0.000001" name="entry.155173482" id="entry.1551734820" class="form-control" placeholder="Mario" required>
+            </div>
+
+            <div class="col-md-4">
+              <br>
+              Cognome:
+              <input type="text" step="0.000001" name="entry.91170635" id="entry.91170635" class="form-control" placeholder="Rossi" required>
+            </div>
+
+            <div class="col-md-4">
+              <br>
+              Email:
+              <input type="email" step="0.000001" name="entry.1318348932" id="entry.1318348932" class="form-control" placeholder="mario.rossi@gmail.com" required>
+            </div>
+
+            <div class="col-md-12">
+              <br>
+              Descrizione:<br>
+              <input type="text" name="entry.2145982373" id="entry.2145982373" class="form-control" placeholder="Guasto alla rete idrica" required>
+            </div>
+
+
+            <div class="col-md-12"></div>
+
+            <div class="col-md-2">
+              <br>
+              Latitudine:
+              <input type="number" step="0.000001" name="entry.1599012610" id="entry.1599012610" class="form-control" placeholder="43.476422" required>
+            </div>
+            <div class="col-md-2">
+              <br>
+              Longitudine:
+              <input type="number" step="0.000001" name="entry.531612609" id="entry.531612609" class="form-control" placeholder="10.728512" required>
+            </div>
+            <div class="col-md-2">
+              <br>
+              <br>
+              <input type="submit" class="btn btn-primary" value="Submit">
+            </div>
+          </div>
+
+        </form>
+        <br>
+
+
+        <!-- <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted) {}"></iframe> -->
+        <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted) {window.location.href='http://localhost/comune_lajatico/HTML/d_atlanteSegnalazioni.html';}"></iframe>
+
+
+    <!-- Leafet MAP Containner -->
+    <div id="map"></div>
+  </main>
+
+  <!-- Plugins -->
+  <script src="../js/plugins/sidebarV2/leaflet-sidebar.js"></script>
+  <script src="../js/plugins/fullScreen/Leaflet.fullscreen.js"></script>
+  <script src="../js/plugins/awesome-markers/leaflet.awesome-markers.js"></script>
+<script type="text/javascript">var submitted=false;</script>
+    <script type="text/javascript">
+    var map = L.map('map', {
+      // measureControl: true,
+      fullscreenControl: {
+        pseudoFullscreen: false
+      },
+    }).setView([39.39896,16.29371], 12);
+
+    map.zoomControl.setPosition('bottomleft');
+
+
+    // var OpenTopoMap = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+    //   maxZoom: 17,
+    //   attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+    // }).addTo(map);
+
+    var OpenStreetMap_Mapnik = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    	maxZoom: 19,
+    	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // L.control.sideBySide(OpenTopoMap, Esri_WorldImagery).addTo(map);
+
+    var masked = turf.mask(lajatico);
+
+    var lajaticoMasked = L.geoJSON(masked, {
+                            opacity: 1,color: 'white',
+                            dashArray: '10, 12, 5',
+                            fillColor: 'grey',
+                            fillOpacity: 0.5,
+                            weight: 1
+                          }
+                        ).addTo(map);
+
+    var layer = L.geoJSON(lajatico);
+    var layer_bounds = layer.getBounds();
+    map.fitBounds(layer_bounds);
+
+
+    var marker =  L.marker([43.475743, 10.728859], { opacity: 0.01 }).addTo(map);
+      marker.bindPopup("Clicca sulla mappa").openPopup()
+
+
+var nuovaSegnalazione;
+map.on('click', function(e) {
+  if (nuovaSegnalazione) {
+    nuovaSegnalazione.remove();
+  }
+  var lat = e.latlng.lat;
+  var lon = e.latlng.lng;
+  nuovaSegnalazione = L.marker([lat, lon], {
+      icon: L.AwesomeMarkers.icon({
+        icon: 'spinner',
+        markerColor: 'blue',
+        prefix: 'fa',
+        spin:true}
+      ),
+      draggable: true
+    }).addTo(map);
+    nuovaSegnalazione.bindPopup("<b>"+ "Lat: " + "</b>"+  e.latlng.lat.toFixed(5).toString() + "<br>" + "<b>"+ "Lon: "  + "</b>"+ e.latlng.lng.toFixed(5).toString()).openPopup()
+// nuovaSegnalazione.bindPopup(form, {maxWidth:400});
+});
+
+
+// resetFeatureStyle
+
+
+var public_spreadsheet_url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRj9bA9o98NQDelOVRY5Ap9tAtcZABlY46K92dCt6dT__HPaK9CXVVNCctDsO61xIeuQGl6Gj7zmOrs/pub?output=csv';
+
+function init() {
+  Papa.parse(public_spreadsheet_url, {
+    download: true,
+    header: true,
+    complete: addPoints
+  })
+}
+window.addEventListener('DOMContentLoaded', init)
+
+function addPoints(data) {
+  data = data.data;
+  let pointGroupLayer = L.layerGroup().addTo(map);
+  let markerType = "marker";
+  let markerRadius = 100;
+
+  for (let row = 0; row < data.length; row++) {
+    let marker;
+    if (markerType == "circleMarker") {
+      marker = L.circleMarker([data[row].Latitude, data[row].Longitude], {
+        radius: markerRadius,
+      });
+    } else if (markerType == "circle") {
+      marker = L.circle([data[row].Latitude, data[row].Longitude], {
+        radius: markerRadius,
+      });
+    } else {
+      marker = L.marker([data[row].Latitude, data[row].Longitude]);
+    }
+    marker.addTo(pointGroupLayer);
+
+    // UNCOMMENT THIS LINE TO USE POPUPS
+    //marker.bindPopup('<h2>' + data[row].name + '</h2>There's a ' + data[row].description + ' here');
+
+    // COMMENT THE NEXT GROUP OF LINES TO DISABLE SIDEBAR FOR THE MARKERS
+    marker.on('mouseover', function(e) {
+      //open popup;
+      var popup = L.popup()
+       .setLatLng(e.latlng)
+       .setContent("<b>"+ "Descrizione: " + "</b>" + "<br>" + data[row].Description +"<br>" + "<b>"+ "email:" + "</b>" + "<br>" + data[row].Email )
+       .openOn(map);
+    });
+    // COMMENT UNTIL HERE TO DISABLE SIDEBAR FOR THE MARKERS
+
+    // AwesomeMarkers is used to create fancier icons
+    let icon = L.AwesomeMarkers.icon({
+      icon: "info-circle",
+      iconColor: "white",
+      markerColor: data[row].color,
+      prefix: "fa",
+      extraClasses: "fa-rotate-0",
+    });
+    if (!markerType.includes("circle")) {
+      marker.setIcon(icon);
+    }
+  }
+}
+
+
+    $('#gform').on('submit', function(e) {
+      $('#gform *').fadeOut(6000);
+      $('#gform').prepend('<b style="color:red;">La Vostra segnalazione è stata presa in carico...</b>');
+      });
+    </script>
+    <!--base JS-->
+
+
+    <br /><br /><br />
+    <!-- Footer -->
+    <footer class="py-2 bg-success">
+      <p class="m-0 text-center text-white">Copyright &copy; Filippo Maria Raeli <?php echo date('Y'); ?></p>
+    </footer>
+  </body>
+</html>

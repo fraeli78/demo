@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="it" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Web Mapping</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <!-- Downloaded Version of Leaflet - https://leafletjs.com/download.html -->
+    <!-- leaflet 1.7.1 css -->
+    <link rel="stylesheet" href="../css/leaflet.css" />
+    <!-- css -->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/fontawesome.min.css" rel="stylesheet"> -->
+
+    <link rel="stylesheet" href="../css/style.css" />
+    <!-- plugin css -->
+    <link rel="stylesheet" href="../css/plugins/leaflet.fullscreen.css" />
+    <link rel="stylesheet" href="../css/plugins/leaflet.awesome-markers.css" />
+
+    <!-- bootstrap 4.3.1 -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+    <!-- ionicon stylesheet -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/4.5.6/css/ionicons.min.css">
+
+    <!-- leaflet 1.7.1 js -->
+    <script src="../js/base/leaflet.js"></script>
+
+    <!-- Load Esri Leaflet from CDN -->
+    <script src="https://unpkg.com/esri-leaflet@3.0.2/dist/esri-leaflet.js"
+      integrity="sha512-myckXhaJsP7Q7MZva03Tfme/MSF5a6HC2xryjAM4FxPLHGqlh5VALCbywHnzs2uPoF/4G/QVXyYDDSkp5nPfig=="
+      crossorigin=""></script>
+
+    <!-- plugin js -->
+    <script src="../js/plugins/leaflet_side_by_side/leaflet-side-by-side.js"></script>
+
+    <!-- jquery3.1.1 -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- turf@5 -->
+    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@5/turf.min.js"></script>
+
+    <!-- bootstrap 4.3.1 -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <!-- data -->
+    <script src="../data/lajatico_wgs84.js"></script>
+    <script src="../data/percorsiLajatico.js"></script>
+
+      <style>
+          #map {
+              height: 700px;
+              width: 100%;
+              border: solid 2px black;
+          }
+          #descrizione {
+              margin-left: 10px;
+          }
+      </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-sm bg-success navbar-dark">
+      <div class="container">
+        <!-- Brand/logo -->
+        <a class="navbar-brand" target="_blank" href="https://www.comune.lajatico.pi.it/homepage">
+          <img src="../css/images/icons/stemmaLajatico.png" alt="logo" style="width:30px;">
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="collapsibleNavbar">
+          <!-- Links -->
+          <ul class="navbar-nav mx-auto">
+            <li class="nav-item text-center">
+              <a class="nav-link" href="../index.html">HOME</a>
+            </li>
+            <li class="nav-item text-center">
+              <a class="nav-link" href="a_quadroConoscitivo.html">Quadro Conoscitivo</a>
+            </li>
+            <li class="nav-item active text-center">
+              <a class="nav-link" href="b_percorsi.html">Percorsi</a>
+            </li>
+            <li class="nav-item text-center">
+              <a class="nav-link" href="c_marketingTerritoriale.html">Marketing</a>
+            </li>
+            <li class="nav-item text-center">
+              <a class="nav-link" href="d_atlanteSegnalazioni.html">Segnalazioni</a>
+            </li>
+            <!-- Dropdown -->
+            <li class="nav-item dropdown text-center">
+              <a class="nav-link dropdown-toggle" href="d_protezioneCivile.html" id="navbardrop" data-toggle="dropdown">
+                Protezione Civile
+              </a>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="#">PAI</a>
+                <a class="dropdown-item" href="#">Zone Sismiche</a>
+                <a class="dropdown-item" href="#">Frane</a>
+              </div>
+            </li>
+            <!-- Dropdown -->
+            <li class="nav-item dropdown text-center">
+              <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                Transporti
+              </a>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="#">Aeroporti</a>
+                <a class="dropdown-item" href="#">Treni</a>
+                <!--                <a class="dropdown-item" href="#">CAI</a>-->
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+<!-- Begin page content -->
+<main role="main" class="container" >
+    <p class="mt-5 text-justify">
+      L’ambiente è la maggiore risorsa del Comune di Lajatico con percorsi verdi, e con passeggiate nei boschi e nei sentieri o relax in un bel prato, con la possibilità di vedere varie specie di uccelli e di animali, nel loro habitat naturale, godere dall’alto dei colli di panorami mozzafiato nella natura incontaminata.
+            <span class="mw-editsection">
+              <span class="mw-editsection-bracket">
+                [
+              </span>
+                <a href=https://toscana.altavaldera.it/page.php?id=73  target="_blank" class="mw-editsection-visualeditor">Alta Valdera</a>
+                <span class="mw-editsection-bracket">]
+                </span>
+          </span>
+        </p>
+        <br>
+
+    <!-- Leafet MAP Containner -->
+    <div id="map"></div>
+  </main>
+
+  <!-- Plugins -->
+  <script src="../js/plugins/fullScreen/Leaflet.fullscreen.js"></script>
+  <script src="../js/plugins/awesome-markers/leaflet.awesome-markers.js"></script>
+
+    <script type="text/javascript">
+    var map = L.map('map', {
+      // measureControl: true,
+      fullscreenControl: {
+        pseudoFullscreen: false
+      },
+    }).setView([39.39896,16.29371], 12);
+
+    map.zoomControl.setPosition('bottomleft');
+
+    var mbAttr = 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, ' +
+        'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+      mbUrl = 'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw';
+
+    var imagery   = L.tileLayer(mbUrl, {id: 'mapbox/satellite-streets-v11', tileSize: 512, zoomOffset: -1, attribution: mbAttr});
+
+    var OpenStreetMap_Mapnik = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    	maxZoom: 19,
+    	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    });
+
+    var CyclOSM = L.tileLayer('https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png', {
+    	maxZoom: 20,
+    	attribution: '<a href="https://github.com/cyclosm/cyclosm-cartocss-style/releases" title="CyclOSM - Open Bicycle render">CyclOSM</a> | Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    // var Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    //   attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+    // }).addTo(map);
+    //
+    // L.control.sideBySide(OpenTopoMap, Esri_WorldImagery).addTo(map);
+
+    var masked = turf.mask(lajatico);
+
+    var lajaticoMasked = L.geoJSON(masked, {
+                            opacity: 1,color: 'white',
+                            dashArray: '10, 12, 5',
+                            fillColor: 'grey',
+                            fillOpacity: 0.5,
+                            weight: 1
+                          }
+                        ).addTo(map);
+
+    var layer = L.geoJSON(lajatico);
+    var layer_bounds = layer.getBounds();
+    map.fitBounds(layer_bounds);
+
+
+
+
+
+  var anelloPrincipale =   L.geoJSON(percorsi, {
+       style: style_percorsi,
+       onEachFeature: function (feature, layer) {
+           layer.bindPopup("Nome: " + "<b>" + feature.properties.Nome + "</b>"+"<br>"+
+                            "Nr: " + "<b>" + feature.properties.Nr + "</b>");
+       },
+       filter: function(feature) {
+         if (feature.properties.Nome === 'Anello principale') {
+           return true;
+         }
+       }
+    }).addTo(map);
+
+    var colleAsino =   L.geoJSON(percorsi, {
+         style: style_percorsi,
+         onEachFeature: function (feature, layer) {
+             layer.bindPopup("Nome: " + "<b>" + feature.properties.Nome + "</b>"+"<br>"+
+                              "Nr: " + "<b>" + feature.properties.Nr + "</b>");
+         },
+         filter: function(feature) {
+           if (feature.properties.Nome === 'Colle all\'Asino') {
+             return true;
+           }
+         }
+      }).addTo(map);
+
+      var laFoscecchia =   L.geoJSON(percorsi, {
+           style: style_percorsi,
+           onEachFeature: function (feature, layer) {
+               layer.bindPopup("Nome: " + "<b>" + feature.properties.Nome + "</b>"+"<br>"+
+                                "Nr: " + "<b>" + feature.properties.Nr + "</b>");
+           },
+           filter: function(feature) {
+             if (feature.properties.Nome === 'La Foscecchia') {
+               return true;
+             }
+           }
+        }).addTo(map);
+
+
+
+var laMontaccina =   L.geoJSON(percorsi, {
+     style: style_percorsi,
+     onEachFeature: function (feature, layer) {
+         layer.bindPopup("Nome: " + "<b>" + feature.properties.Nome + "</b>"+"<br>"+
+                          "Nr: " + "<b>" + feature.properties.Nr + "</b>");
+     },
+     filter: function(feature) {
+       if (feature.properties.Nome === 'La Montaccina') {
+         return true;
+       }
+     }
+  }).addTo(map);
+
+
+
+var mofetaDiBorboi =   L.geoJSON(percorsi, {
+     style: style_percorsi,
+     onEachFeature: function (feature, layer) {
+         layer.bindPopup("Nome: " + "<b>" + feature.properties.Nome + "</b>"+"<br>"+
+                          "Nr: " + "<b>" + feature.properties.Nr + "</b>");
+     },
+     filter: function(feature) {
+       if (feature.properties.Nome === 'Mofeta dI Borboi') {
+         return true;
+       }
+     }
+  }).addTo(map);
+
+
+
+var muliniAvento =   L.geoJSON(percorsi, {
+     style: style_percorsi,
+     onEachFeature: function (feature, layer) {
+         layer.bindPopup("Nome: " + "<b>" + feature.properties.Nome + "</b>"+"<br>"+
+                          "Nr: " + "<b>" + feature.properties.Nr + "</b>");
+     },
+     filter: function(feature) {
+       if (feature.properties.Nome === 'Mulini a vento') {
+         return true;
+       }
+     }
+  }).addTo(map);
+    function style_percorsi(feature) {
+        switch(String(feature.properties['Nome'])) {
+            case 'Anello principale':
+                return {
+            // pane: 'pane_percorsi_lajaticolajatico_0',
+            opacity: 1,
+            color: 'rgba(35,14,223,1.0)',
+            dashArray: '',
+            lineCap: 'square',
+            lineJoin: 'bevel',
+            weight: 3,
+            fillOpacity: 0,
+            interactive: true,
+        }
+                break;
+            case 'Colle all\'Asino':
+                return {
+            // pane: 'pane_percorsi_lajaticolajatico_0',
+            opacity: 1,
+            color: 'rgba(103,211,146,1.0)',
+            dashArray: '',
+            lineCap: 'square',
+            lineJoin: 'bevel',
+            weight: 3,
+            fillOpacity: 0,
+            interactive: true,
+        }
+                break;
+            case 'La Foscecchia':
+                return {
+            // pane: 'pane_percorsi_lajaticolajatico_0',
+            opacity: 1,
+            color: 'rgba(216,41,73,1.0)',
+            dashArray: '',
+            lineCap: 'square',
+            lineJoin: 'bevel',
+            weight: 3,
+            fillOpacity: 0,
+            interactive: true,
+        }
+                break;
+            case 'La Montaccina':
+                return {
+            // pane: 'pane_percorsi_lajaticolajatico_0',
+            opacity: 1,
+            color: 'rgba(153,237,79,1.0)',
+            dashArray: '',
+            lineCap: 'square',
+            lineJoin: 'bevel',
+            weight: 3,
+            fillOpacity: 0,
+            interactive: true,
+        }
+                break;
+            case 'Mofeta dI Borboi':
+                return {
+            // pane: 'pane_percorsi_lajaticolajatico_0',
+            opacity: 1,
+            color: 'rgba(231,117,235,1.0)',
+            dashArray: '',
+            lineCap: 'square',
+            lineJoin: 'bevel',
+            weight: 3,
+            fillOpacity: 0,
+            interactive: true,
+        }
+                break;
+            case 'Mulini a vento':
+                return {
+            // pane: 'pane_percorsi_lajaticolajatico_0',
+            opacity: 1,
+            color: 'rgba(65,184,224,1.0)',
+            dashArray: '',
+            lineCap: 'square',
+            lineJoin: 'bevel',
+            weight: 3,
+            fillOpacity: 0,
+            interactive: true,
+        }
+                break;
+            default:
+                return {
+            // pane: 'pane_percorsi_lajaticolajatico_0',
+            opacity: 1,
+            color: 'rgba(223,195,135,1.0)',
+            dashArray: '',
+            lineCap: 'square',
+            lineJoin: 'bevel',
+            weight: 3,
+            fillOpacity: 0,
+            interactive: true,
+        }
+                break;
+        }
+    }
+
+    var baseLayers = {
+      "Cycle Map":CyclOSM,
+      "Open Street Map":OpenStreetMap_Mapnik,
+      "Satellite": imagery,
+
+    };
+    var overlays = {
+      // "<img src='../css/legend/percorsi_lajaticolajatico_0_ColleallAsino1.png' width='24' height='28'>&nbsp;Bay Circuit Trail": anelloPrincipale,
+      "Anello Principale": anelloPrincipale,
+      "Colle all\'Asino": colleAsino,
+      "La Foscecchia": laFoscecchia,
+      "La Montaccina": laMontaccina,
+      "Mofeta di Borboi": mofetaDiBorboi,
+      "Mulini a vento": muliniAvento
+    };
+
+    L.control.layers(baseLayers, overlays, {
+      collapsed: false
+    }).addTo(map);
+
+    // L.control.layers(baseMaps,{
+    //   '
+    //   <table>
+    //   <tr>
+    //   <td style="text-align: center;"><img src="../css/legend/percorsi_lajaticolajatico_0_Anelloprincipale0.png" /></td>
+    //   <td>Anello principale</td></tr><tr><td style="text-align: center;"><img src="../css/legend/percorsi_lajaticolajatico_0_ColleallAsino1.png" /></td>
+    //   <td>Colle all\'Asino</td></tr><tr><td style="text-align: center;"><img src="../css/legend/percorsi_lajaticolajatico_0_LaFoscecchia2.png" /></td>
+    //   <td>La Foscecchia</td></tr><tr><td style="text-align: center;"><img src="../css/legend/percorsi_lajaticolajatico_0_LaMontaccina3.png" /></td>
+    //   <td>La Montaccina</td></tr><tr><td style="text-align: center;"><img src="l../css/legend/percorsi_lajaticolajatico_0_MofetadIBorboi4.png" /></td>
+    //   <td>Mofeta dI Borboi</td></tr><tr><td style="text-align: center;"><img src="../css/legend/percorsi_lajaticolajatico_0_Muliniavento5.png" /></td>
+    //   <td>Mulini a vento</td></tr><tr><td style="text-align: center;"><img src="../css/legend/percorsi_lajaticolajatico_0_6.png" /></td><td></td>
+    //   </tr>
+    //   </table>': sentieri,},{
+    //     collapsed:false
+    //   }).addTo(map);
+    </script>
+    <!--base JS-->
+    <script src="../js/base/scalebar.js"></script>
+    <!-- <script src="../js/base/showUrl.js"></script> -->
+
+    <br /><br /><br />
+    <!-- Footer -->
+    <footer class="py-2 bg-success">
+      <p class="m-0 text-center text-white">Copyright &copy; Filippo Maria Raeli <?php echo date('Y'); ?></p>
+    </footer>
+  </body>
+</html>
