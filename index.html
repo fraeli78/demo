@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="it" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Web Mapping</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <!-- Downloaded Version of Leaflet - https://leafletjs.com/download.html -->
+    <!-- leaflet 1.7.1 css -->
+    <link rel="stylesheet" href="css/leaflet.css" />
+    <!-- css -->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/fontawesome.min.css" rel="stylesheet"> -->
+
+    <link rel="stylesheet" href="css/style.css" />
+    <!-- plugin css -->
+    <link rel="stylesheet" href="css/plugins/leaflet.fullscreen.css" />
+    <link rel="stylesheet" href="css/plugins/leaflet.awesome-markers.css" />
+    <link rel="stylesheet" href="css/plugins/Control.MiniMap.css" />
+
+    <!-- bootstrap 4.3.1 -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+    <!-- ionicon stylesheet -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/4.5.6/css/ionicons.min.css">
+
+    <!-- leaflet 1.7.1 js -->
+    <script src="js/base/leaflet.js"></script>
+
+    <!-- Load Esri Leaflet from CDN -->
+    <script src="https://unpkg.com/esri-leaflet@3.0.2/dist/esri-leaflet.js"
+      integrity="sha512-myckXhaJsP7Q7MZva03Tfme/MSF5a6HC2xryjAM4FxPLHGqlh5VALCbywHnzs2uPoF/4G/QVXyYDDSkp5nPfig=="
+      crossorigin=""></script>
+    <!-- plugin js -->
+    <script src="js/plugins/leaflet_side_by_side/leaflet-side-by-side.js"></script>
+    <script src="js/plugins/minimap/Control.MiniMap.js"></script>
+
+    <!-- jquery3.1.1 -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- turf@5 -->
+    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@5/turf.min.js"></script>
+
+    <!-- bootstrap 4.3.1 -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <!-- data -->
+    <script src="data/lajatico_wgs84.js"></script>
+    <script src="data/comuniToscana.js"></script>
+
+      <style>
+          #map {
+              height: 700px;
+              width: 100%;
+              border: solid 2px black;
+          }
+          #descrizione {
+              margin-left: 10px;
+          }
+          #basemaps-wrapper {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 400;
+            background: white;
+            padding: 10px;
+          }
+          #basemaps {
+            margin-bottom: 5px;
+          }
+      </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-sm bg-success navbar-dark">
+      <div class="container">
+        <!-- Brand/logo -->
+        <a class="navbar-brand" target="_blank" href="https://www.comune.lajatico.pi.it/homepage">
+          <img src="css/images/icons/stemmaLajatico.png" alt="logo" style="width:30px;">
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="collapsibleNavbar">
+          <!-- Links -->
+          <ul class="navbar-nav mx-auto">
+            <li class="nav-item active text-center">
+              <a class="nav-link" href="index.php">HOME</a>
+            </li>
+            <li class="nav-item text-center">
+              <a class="nav-link" href="HTML/a_quadroConoscitivo.html">Quadro Conoscitivo</a>
+            </li>
+            <li class="nav-item text-center">
+              <a class="nav-link" href="HTML/b_percorsi.html">Percorsi</a>
+            </li>
+            <li class="nav-item text-center">
+              <a class="nav-link" href="HTML/c_marketingTerritoriale.html">Marketing</a>
+            </li>
+            <li class="nav-item text-center">
+              <a class="nav-link" href="HTML/d_atlanteSegnalazioni.html">Segnalazioni</a>
+            </li>
+            <!-- Dropdown -->
+            <li class="nav-item dropdown text-center">
+              <a class="nav-link dropdown-toggle" href="HTML/d_protezioneCivile.html" id="navbardrop" data-toggle="dropdown">
+                Protezione Civile
+              </a>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="#">PAI</a>
+                <a class="dropdown-item" href="#">Zone Sismiche</a>
+                <a class="dropdown-item" href="#">Frane</a>
+              </div>
+            </li>
+            <!-- Dropdown -->
+            <li class="nav-item dropdown text-center">
+              <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                Trasporti
+              </a>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="#l">Aeroporti</a>
+                <a class="dropdown-item" href="#">Treni</a>
+                <!--                <a class="dropdown-item" href="#">CAI</a>-->
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+<!-- Begin page content -->
+<main role="main" class="container" >
+    <p class="mt-5 text-justify">
+      Il Comune di <b>Lajatico</b> ha un’estensione territoriale di 72 Kmq
+      di cui una minima parte pianeggiante ed il resto collinare – montano (altezze variabili da 100 a 650 m sul livello del mare), domina il congiungersi della Val d’Era con la Val di Cecina.
+      La Sterza, una sua frazione, costituisce la porta naturale tra queste due realtà geografiche. Racchiuso tra il torrente Sterza e i fiumi Era e Ragone, suoi confini naturali, è situato in una posizione centrale che facilita gli spostamenti e le visite verso le principali città d’arte toscane ed i luoghi balneari.
+      Inoltre, con il 60% della sua superficie territoriale coperta da boschi e pinete, offre un’opportunità esclusiva al turismo naturalistico.
+            <span class="mw-editsection">
+              <span class="mw-editsection-bracket">
+                [
+              </span>
+                <a href="https://www.lajaticotoscana.it/lajatico/"  target="_blank" class="mw-editsection-visualeditor">Lajatico e il suo territorio</a>
+                <span class="mw-editsection-bracket">]
+                </span>
+          </span>
+        </p>
+        <br>
+
+    <!-- Leafet MAP Containner -->
+    <div id="map"></div>
+  </main>
+
+  <!-- Plugins -->
+  <script src="js/plugins/sidebarV2/leaflet-sidebar.js"></script>
+  <script src="js/plugins/fullScreen/Leaflet.fullscreen.js"></script>
+  <script src="js/plugins/awesome-markers/leaflet.awesome-markers.js"></script>
+
+    <script type="text/javascript">
+    var map = L.map('map', {
+      maxZoom: 12,
+      // measureControl: true,
+      fullscreenControl: {
+        pseudoFullscreen: false
+      },
+    }).setView([43.475120, 10.728498], 11);
+    map.zoomControl.setPosition('bottomleft');
+
+
+
+    var Stamen_Terrain = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.{ext}', {
+    	attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    	subdomains: 'abcd',
+    	minZoom: 0,
+    	maxZoom: 18,
+    	ext: 'png'
+    }).addTo(map);
+
+    var miniMap = new L.Control.MiniMap(
+      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
+      }),
+      {
+        toggleDisplay: true,
+        position: 'bottomright'
+      }).addTo(map);
+
+    var masked = turf.mask(lajatico);
+
+    var lajaticoMasked = L.geoJSON(masked, {
+                            opacity: 1,
+                            color: 'white',
+                            dashArray: '10, 12, 5',
+                            fillColor: 'grey',
+                            fillOpacity: 0.5,
+                            weight: 1
+                          }
+                        ).addTo(map);
+
+    var layer = L.geoJSON(comuniToscana, {
+                            opacity: 0.5,
+                            color: 'white',
+                            dashArray: '10, 12, 5',
+                            fillColor: 'grey',
+                            fillOpacity: 0.1,
+                            weight: 1
+                          }
+    ).addTo(map);
+    var layer_bounds = layer.getBounds();
+    // map.fitBounds(layer_bounds);
+
+    var redMarker =  L.AwesomeMarkers.icon({
+      icon: 'coffee',
+      markerColor: 'red',
+      prefix: 'fa',
+      iconColor: 'black'
+    });
+
+
+    // var municipio = L.marker([43.475120, 10.728498], {
+    //                             icon: L.AwesomeMarkers.icon({
+    //                                   icon: 'spinner',
+    //                                   markerColor: 'red',
+    //                                   prefix: 'fa',
+    //                                   spin:true}
+    //                                 )}
+    //                               ).addTo(map);
+    //
+    // var popupContent = '<img src="css/images/foto/centroStorico.jpg" width="300">'
+    //
+    // municipio.bindPopup(popupContent).openPopup();
+    //
+    // municipio.addTo(map);
+
+    </script>
+    <!--base JS-->
+    <!-- <script src="js/base/scalebar.js"></script> -->
+
+    <br /><br /><br />
+    <!-- Footer -->
+    <footer class="py-2 bg-success">
+      <p class="m-0 text-center text-white">Copyright &copy; Filippo Maria Raeli <?php echo date('Y'); ?></p>
+    </footer>
+  </body>
+</html>
